@@ -1,0 +1,103 @@
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const UserModel = require("../models/userModel");
+
+const Register = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    const userRole = role && (role === "admin" || role === "user") ? role : "user";
+
+    const userExists = await UserModel.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({
+        success: false,
+        error: "User already exists",
+      });
+    }
+
+    const usernameExists = await UserModel.findOne({ name });
+    if (usernameExists) {
+      return res.status(400).json({
+        success: false,
+        error: "Username is already taken. Please choose another one.",
+      });
+    }
+
+    const hashPassword = await bcrypt.hashSync(password, 10);
+
+    const newUser = await UserModel.create({
+      name,
+      email,
+      password: hashPassword,
+      role: userRole,
+    });
+    res.status(201).json({
+      message: "User registered successfully!",
+      success: true,
+      data: newUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+const Login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Invalid Credentials" });
+    }
+
+    const passwordValid = await bcrypt.compare(password, user.password);
+    if (!passwordValid) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Invalid Credentials!" });
+    }
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "30d",
+      }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    res
+      .status(200)
+      .json({ success: true, message: "Login successfull!", user });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+const Logout = async (req, res) => {
+  try {
+    res.clearCookie("token");
+    res
+      .status(200)
+      .json({ success: true, message: "Logged out successfully!" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+    console.log(error);
+  }
+};
+
+module.exports = { Register, Login, Logout };
