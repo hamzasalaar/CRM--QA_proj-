@@ -61,6 +61,7 @@ export default function Register() {
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
         </div>
         <div className="input-group">
@@ -72,7 +73,7 @@ export default function Register() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+            pattern="^(?=.*[A-Za-z])(?=.*\d).{8,16}$"
             title="Password must be at least 8 characters long and contain both letters and numbers."
           />
         </div>

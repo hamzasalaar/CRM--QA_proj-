@@ -15,7 +15,7 @@ export default function Admin() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("user"); // Default role for normal users
+  // const [role, setRole] = useState("user"); // Default role for normal users
 
   const toggleForm = () => {
     setShowForm(!showForm);
@@ -83,7 +83,7 @@ export default function Admin() {
           setName("");
           setEmail("");
           setPassword("");
-          setRole("user"); // Reset role to default after user creation
+          // setRole("user"); // Reset role to default after user creation
           setShowForm(false);
         }
       }
@@ -162,17 +162,23 @@ export default function Admin() {
                 maxLength="16"
               />
               {/* Only show the role select field if the user is an admin */}
-              <select
+              {/* <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 disabled={role === "user"} // Disable role selection for non-admin users
               >
                 <option value="user">User</option>
                 <option value="admin">Admin</option>
-              </select>
+              </select> */}
               <div className="form-buttons">
-                <button className="create-user-btn" type="submit">Create User</button>
-                <button className="cancel-btn" type="button" onClick={() => setShowForm(false)}>
+                <button className="create-user-btn" type="submit">
+                  Create User
+                </button>
+                <button
+                  className="cancel-btn"
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                >
                   Cancel
                 </button>
               </div>

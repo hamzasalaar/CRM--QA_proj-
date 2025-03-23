@@ -6,8 +6,6 @@ const Register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    const userRole = role && (role === "admin" || role === "user") ? role : "user";
-
     const userExists = await UserModel.findOne({ email });
     if (userExists) {
       return res.status(400).json({
@@ -30,8 +28,10 @@ const Register = async (req, res) => {
       name,
       email,
       password: hashPassword,
-      role: userRole,
     });
+
+    await newUser.save()
+
     res.status(201).json({
       message: "User registered successfully!",
       success: true,
