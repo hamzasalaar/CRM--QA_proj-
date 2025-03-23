@@ -20,6 +20,14 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    failedAttempts: {
+      type: Number,
+      default: 0,
+    },
+    lockUntil: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

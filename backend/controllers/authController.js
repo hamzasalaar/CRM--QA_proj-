@@ -53,15 +53,37 @@ const Login = async (req, res) => {
     if (!user) {
       return res
         .status(404)
-        .json({ success: false, message: "Invalid Credentials" });
+        .json({ success: false, message: "Invalid credentials!" });
+    }
+
+    // Check if the account is locked due to too many failed attempts
+    if (user.lockUntil && user.lockUntil > Date.now()) {
+      return res.status(403).json({
+        success: false,
+        message: `Account is locked. Try again after ${new Date(user.lockUntil).toLocaleString()}`,
+      });
     }
 
     const passwordValid = await bcrypt.compare(password, user.password);
     if (!passwordValid) {
+
+      user.failedAttempts += 1;
+
+      if (user.failedAttempts >= 5) {
+        user.lockUntil = Date.now() + 15 * 60 * 1000; 
+      }
+
+      await user.save();
+
       return res
         .status(404)
         .json({ success: false, message: "Invalid Credentials!" });
     }
+
+    user.failedAttempts = 0;
+    user.lockUntil = null; 
+    await user.save();
+
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,

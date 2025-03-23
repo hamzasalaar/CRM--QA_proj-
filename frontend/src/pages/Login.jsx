@@ -13,7 +13,7 @@ export default function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null); // To display error messages
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,6 +38,10 @@ export default function Login() {
         } else if (role === "user") {
           navigate("/");
         }
+      } else if (response.status === 403) {
+        toast.error(
+          "Your account is temporarily locked. Please try again later."
+        );
       }
       console.log(response);
     } catch (error) {
