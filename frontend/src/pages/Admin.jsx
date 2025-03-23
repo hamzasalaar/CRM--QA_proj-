@@ -24,6 +24,28 @@ export default function Admin() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // // Effect to check user access to the admin panel
+  // useEffect(() => {
+  //   const checkAdminAccess = async () => {
+  //     try {
+  //       const response = await axios.get("http://localhost:3000/api/admin", {
+  //         withCredentials: true,
+  //       });
+
+  //       if (response.status === 401) {
+  //         toast.error("Unauthorized access! You must be an admin.");
+  //         navigate("/"); // Redirect to home page if not authorized
+  //       }
+  //     } catch (error) {
+  //       if (error.response) {
+  //         toast.error(error.response.data.message || "Unauthorized access!");
+  //         navigate("/"); // Redirect if the user is not an admin
+  //       }
+  //     }
+  //   };
+  //   checkAdminAccess();
+  // }, [navigate]);
+
   useEffect(() => {
     const GetUsers = async () => {
       try {
@@ -38,15 +60,22 @@ export default function Admin() {
           setError("Failed to fetch users.");
         }
       } catch (error) {
-        console.error(error);
-        setError("An error occurred while fetching users.");
+        // console.error(error);
+        // Catch unauthorized error and show toast
+        if (error.response && error.response.status === 401) {
+          toast.error("Unauthorized access!");
+          navigate("/"); // Redirect to home page if not authorized
+        } else {
+          console.error(error); // Log error for any other issues
+          setError("An error occurred while fetching users.");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     GetUsers();
-  }, []);
+  }, [navigate]);
 
   const handleDelete = async (id) => {
     try {
