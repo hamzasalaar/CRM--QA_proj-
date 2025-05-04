@@ -4,7 +4,7 @@ const UserModel = require("../models/userModel");
 
 const Register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     const userExists = await UserModel.findOne({ email });
     if (userExists) {
@@ -12,6 +12,10 @@ const Register = async (req, res) => {
         success: false,
         error: "User already exists",
       });
+    }
+
+    if (!["user", "manager", "admin"].includes(role)) {
+      return res.status(400).json({ message: "Invalid role" });
     }
 
     const usernameExists = await UserModel.findOne({ name });
@@ -28,9 +32,10 @@ const Register = async (req, res) => {
       name,
       email,
       password: hashPassword,
+      role,
     });
 
-    await newUser.save()
+    await newUser.save();
 
     res.status(201).json({
       message: "User registered successfully!",
@@ -60,17 +65,18 @@ const Login = async (req, res) => {
     if (user.lockUntil && user.lockUntil > Date.now()) {
       return res.status(403).json({
         success: false,
-        message: `Account is locked. Try again after ${new Date(user.lockUntil).toLocaleString()}`,
+        message: `Account is locked. Try again after ${new Date(
+          user.lockUntil
+        ).toLocaleString()}`,
       });
     }
 
     const passwordValid = await bcrypt.compare(password, user.password);
     if (!passwordValid) {
-
       user.failedAttempts += 1;
 
       if (user.failedAttempts >= 5) {
-        user.lockUntil = Date.now() + 15 * 60 * 1000; 
+        user.lockUntil = Date.now() + 15 * 60 * 1000;
       }
 
       await user.save();
@@ -81,7 +87,7 @@ const Login = async (req, res) => {
     }
 
     user.failedAttempts = 0;
-    user.lockUntil = null; 
+    user.lockUntil = null;
     await user.save();
 
     const token = jwt.sign(

@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { post } from "../services/ApiEndpoint";
 import { Logout } from "../redux/AuthSlice";
+import "../css/Admin.css";
 
 export default function Home() {
   const user = useSelector((state) => state.Auth.user);
@@ -38,7 +39,7 @@ export default function Home() {
           ) : (
             ""
           )}
-          <button className="register-button" onClick={handleLogout}>
+          <button className="btn btn-logout" onClick={handleLogout}>
             Logout
           </button>
         </div>

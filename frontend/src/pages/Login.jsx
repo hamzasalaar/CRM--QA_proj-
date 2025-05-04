@@ -19,6 +19,11 @@ export default function Login() {
     e.preventDefault();
     setError(null);
 
+    if (!email || !password) {
+      setError("Both fields are required!");
+      return;
+    }
+
     try {
       const request = await axios.post(
         "http://localhost:3000/api/auth/login",
@@ -36,7 +41,9 @@ export default function Login() {
         if (role === "admin") {
           navigate("/admin");
         } else if (role === "user") {
-          navigate("/");
+          navigate("/user");
+        } else if (role === "manager") {
+          navigate("/manager");
         }
       } else if (response.status === 403) {
         toast.error(

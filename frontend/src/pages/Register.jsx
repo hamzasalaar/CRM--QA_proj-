@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import "../css/Register.css";
@@ -8,22 +8,23 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [role, setRole] = useState("user"); // default role
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/auth/register",
-        { name, email, password }
-      );
+      const response = await axios.post("http://localhost:3000/api/auth/register", {
+        name,
+        email,
+        password,
+        role,
+      });
 
-      // Handle successful registration
       if (response.status === 201) {
         toast.success(response.data.message);
         if (response.data.success) {
-          // Redirect to login page
           navigate("/login");
         }
       }
@@ -53,6 +54,7 @@ export default function Register() {
             required
           />
         </div>
+
         <div className="input-group">
           <label htmlFor="email">Email</label>
           <input
@@ -64,6 +66,7 @@ export default function Register() {
             required
           />
         </div>
+
         <div className="input-group">
           <label htmlFor="password">Password</label>
           <input
@@ -77,9 +80,25 @@ export default function Register() {
             title="Password must be at least 8 characters long and contain both letters and numbers."
           />
         </div>
+
+        {/* Role Selection */}
+        <div className="input-group">
+          <label htmlFor="role">Role</label>
+          <select
+            id="role"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            required
+          >
+            <option value="user">User</option>
+            <option value="manager">Manager</option>
+          </select>
+        </div>
+
         <button type="submit" className="register-button">
           Register
         </button>
+
         <p className="login-link">
           Already have an account? <Link to="/login">Login Here</Link>
         </p>

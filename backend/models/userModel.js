@@ -13,13 +13,19 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "admin"],
+      enum: ["user", "admin", "manager"],
       default: "user",
     },
     password: {
       type: String,
       required: true,
     },
+    manager: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    teamMembers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    pendingRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     failedAttempts: {
       type: Number,
       default: 0,
@@ -34,6 +40,6 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
-const UserModel = mongoose.model("user", UserSchema);
+const UserModel = mongoose.model("User", UserSchema);
 
 module.exports = UserModel;
