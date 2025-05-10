@@ -22,11 +22,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <Toaster />
-      <div className="app-container">
-        <h1>CRM</h1>
+     
         <Routes>
           {/* Public Routes (Login and Register pages) */}
           <Route path="/" element={<PublicLayout />}>
+            <Route index element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
           </Route>
@@ -51,7 +51,7 @@ export default function App() {
             <Route path="tasks" element={<TaskManagement />} />
           </Route>
         </Routes>
-      </div>
+ 
     </BrowserRouter>
   );
 }

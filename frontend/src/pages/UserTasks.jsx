@@ -13,16 +13,15 @@ export default function UserTasks() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/user/my-tasks",
-          { withCredentials: true }
-        );
+        const response = await axios.get("http://localhost:3000/api/user/my-tasks", {
+          withCredentials: true,
+        });
         setTasks(response.data.tasks);
         setLoading(false);
       } catch (err) {
-        console.error(err);
-        setError(err.response?.data?.message || "Failed to fetch tasks");
-        toast.error(err.response?.data?.message || "Failed to fetch tasks");
+        const msg = err.response?.data?.message || "Failed to fetch tasks";
+        toast.error(msg);
+        setError(msg);
         setLoading(false);
       }
     };
@@ -52,10 +51,10 @@ export default function UserTasks() {
       setShowModal(false);
       setSelectedTask(null);
     } catch (error) {
-      console.error(error);
       toast.error(error.response?.data?.message || "Failed to update status");
     }
   };
+
   const handleMarkCompleted = async (id) => {
     try {
       await axios.post(
@@ -70,77 +69,81 @@ export default function UserTasks() {
         )
       );
     } catch (error) {
-      console.error(error);
-      toast.error(
-        error.response?.data?.message || "Failed to mark as completed"
-      );
+      toast.error(error.response?.data?.message || "Failed to mark as completed");
     }
   };
 
-  if (loading) {
-    return <div>Loading tasks...</div>;
-  }
-
-  if (error) {
-    return <div className="text-danger">Error: {error}</div>;
-  }
+  if (loading) return <div className="text-center py-4">Loading tasks...</div>;
+  if (error) return <div className="text-danger text-center py-4">Error: {error}</div>;
 
   return (
-    <div className="user-tasks">
-      <h2 className="mb-4">My Tasks</h2>
+    <div className="container py-4">
+      <h2 className="mb-4 text-center">📋 My Tasks</h2>
+
       {tasks.length === 0 ? (
-        <p>No tasks assigned yet.</p>
+        <p className="text-center">No tasks assigned yet.</p>
       ) : (
-        <table className="table table-bordered">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Title</th>
-              <th>Description</th>
-              <th>Status</th>
-              <th>Due Date</th>
-              <th>Assigned By</th> {/* New column for manager details */}
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tasks.map((task, index) => (
-              <tr key={task._id}>
-                <td>{index + 1}</td>
-                <td>{task.title}</td>
-                <td>{task.description}</td>
-                <td>{task.status}</td>
-                <td>{new Date(task.dueDate).toLocaleDateString()}</td>
-                <td>
-                  {task.createdBy?.name || task.createdBy?.email || "N/A"}
-                </td>{" "}
-                {/* Display manager details */}
-                <td>
-                  <button
-                    className="btn btn-info btn-sm me-2"
-                    onClick={() => handleEditClick(task)}
-                  >
-                    Edit
-                  </button>
-                  {task.status !== "Completed" && (
-                    <button
-                      className="btn btn-success btn-sm"
-                      onClick={() => handleMarkCompleted(task._id)}
-                    >
-                      Mark as Completed
-                    </button>
-                  )}
-                </td>
+        <div className="table-responsive">
+          <table className="table table-hover align-middle shadow-sm rounded">
+            <thead className="table-light">
+              <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Due Date</th>
+                <th>Assigned By</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {tasks.map((task, index) => (
+                <tr key={task._id}>
+                  <td>{index + 1}</td>
+                  <td className="fw-bold">{task.title}</td>
+                  <td>{task.description}</td>
+                  <td>
+                    <span
+                      className={`badge ${
+                        task.status === "Completed"
+                          ? "bg-success"
+                          : task.status === "in-progress"
+                          ? "bg-info"
+                          : "bg-warning text-dark"
+                      }`}
+                    >
+                      {task.status}
+                    </span>
+                  </td>
+                  <td>{new Date(task.dueDate).toLocaleDateString()}</td>
+                  <td>{task.createdBy?.name || task.createdBy?.email || "N/A"}</td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-outline-primary me-2"
+                      onClick={() => handleEditClick(task)}
+                    >
+                      Edit
+                    </button>
+                    {task.status !== "Completed" && (
+                      <button
+                        className="btn btn-sm btn-outline-success"
+                        onClick={() => handleMarkCompleted(task._id)}
+                      >
+                        Complete
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
-      {/* Modal for Editing Task Status */}
+      {/* Modal */}
       {showModal && (
-        <div className="modal show d-block" tabIndex="-1" role="dialog">
-          <div className="modal-dialog" role="document">
+        <div className="modal show d-block" tabIndex="-1">
+          <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Edit Task Status</h5>

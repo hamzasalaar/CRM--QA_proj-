@@ -16,20 +16,7 @@ body {
   margin-top: 50px;
 }
 
-/* Headings */
-.heading-primary {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #343a40;
-  letter-spacing: 1px;
-}
 
-.subheading {
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: #495057;
-  margin-bottom: 30px;
-}
 
 /* Table Styles */
 .table {
@@ -170,3 +157,4 @@ body {
     padding: 8px 12px;
   }
 }
+
