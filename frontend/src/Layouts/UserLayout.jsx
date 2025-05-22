@@ -35,36 +35,24 @@ export default function UserLayout() {
     }
   };
 
-  const handleSendRequest = async () => {
-    try {
-      const managerEmail = prompt("Enter Manager's Email to send request:");
-
-      if (!managerEmail) return;
-
-      const response = await axios.post(
-        "http://localhost:3000/api/user/send-request",
-        { managerEmail },
-        { withCredentials: true }
-      );
-      toast.success(response.data.message);
-    } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.message || "Failed to send request");
-    }
-  };
-
   return (
     <div className="user-dashboard-layout">
       <nav className="p-3 bg-light d-flex justify-content-between align-items-center border-bottom">
         <div>
-          <Link className="me-3" to="/user/dashboard">
+          <Link className="me-3" to="/user">
             Dashboard
           </Link>
           <Link className="me-3" to="/user/tasks">
             My Tasks
           </Link>
-          <Link className="me-3" to="/user/team">
-            Team Requests
+          <Link className="me-3" to="/user/requests">
+            My Requests
+          </Link>
+          <Link className="me-3" to="/user/leads">
+            My Leads
+          </Link>
+          <Link className="me-3" to="/user/deals">
+            My Deals
           </Link>
         </div>
         <button
@@ -75,12 +63,6 @@ export default function UserLayout() {
         </button>
       </nav>
       <div className="p-4">
-        <button
-          className="btn btn-primary btn-sm mb-3"
-          onClick={handleSendRequest}
-        >
-          Send Request to a Join Team
-        </button>
         <Outlet />
       </div>
     </div>

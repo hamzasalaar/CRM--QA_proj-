@@ -99,7 +99,7 @@ export default function UserTasks() {
               <th>Description</th>
               <th>Status</th>
               <th>Due Date</th>
-              <th>Assigned By</th> {/* New column for manager details */}
+              <th>Assigned By</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -113,7 +113,7 @@ export default function UserTasks() {
                 <td>{new Date(task.dueDate).toLocaleDateString()}</td>
                 <td>
                   {task.createdBy?.name || task.createdBy?.email || "N/A"}
-                </td>{" "}
+                </td>
                 {/* Display manager details */}
                 <td>
                   <button

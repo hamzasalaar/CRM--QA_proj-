@@ -5,29 +5,41 @@ const leadSchema = new mongoose.Schema(
     name: { type: String, required: true },
     email: { type: String },
     phone: { type: String },
-    source: { type: String }, // e.g., website, email, social media
+    source: {
+      type: String,
+      enum: ["Website", "Referral", "Social", "Other"],
+      default: "Other",
+    },
+    priority: {
+      type: String,
+      enum: ["Low", "Medium", "High"],
+      default: "Medium",
+    },
     status: {
       type: String,
-      enum: ["new", "qualified", "converted", "rejected"],
-      default: "new",
+      enum: ["New", "Contacted", "Qualified", "Lost"],
+      default: "New",
     },
-    interestLevel: {
-      type: String,
-      enum: ["low", "medium", "high"],
-      default: "medium",
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
     },
-    budget: { type: Number },
-    timeline: { type: String }, // e.g., "1 month", "ASAP"
-    notes: { type: String },
+    notes: [
+      {
+        content: String,
+        date: { type: Date, default: Date.now },
+        author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      },
+    ],
+
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    }, // manager who added the lead
+    },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Lead", leadSchema);

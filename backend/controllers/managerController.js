@@ -77,13 +77,22 @@ const removeUser = async (req, res) => {
         .status(400)
         .json({ success: false, message: "User not found in the team" });
     }
+
+    // Remove the user from teamMembers
     manager.teamMembers = manager.teamMembers.filter(
       (member) => member.toString() !== userIdToRemove
     );
-
     await manager.save();
 
-    // Optionally, you could also remove the user from any tasks they were assigned
+    // ✅ Clear the user's manager field and reset requestStatus
+    const user = await User.findById(userIdToRemove);
+    if (user) {
+      user.manager = null;
+      user.requestStatus = "none";
+      await user.save();
+    }
+
+    // Optionally remove them from tasks
     await Task.updateMany(
       { assignedTo: userIdToRemove },
       { $set: { assignedTo: null } }
@@ -95,9 +104,11 @@ const removeUser = async (req, res) => {
       team: manager.teamMembers,
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 const getTeamMembers = async (req, res) => {
   try {
     const manager = await User.findById(req.user._id).populate(
@@ -112,6 +123,29 @@ const getTeamMembers = async (req, res) => {
     }
     res.status(200).json({ success: true, teamMembers: manager.teamMembers });
   } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const getPendingRequests = async (req, res) => {
+  try {
+    const manager = await User.findById(req.user._id).populate(
+      "pendingRequests",
+      "name email"
+    );
+
+    if (!manager || manager.role !== "manager") {
+      return res
+        .status(401)
+        .json({ success: false, message: "Not authorized!" });
+    }
+
+    res.status(200).json({
+      success: true,
+      pendingRequests: manager.pendingRequests,
+    });
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -133,7 +167,6 @@ const acceptRequest = async (req, res) => {
         .json({ success: false, message: "No pending request from this user" });
     }
 
-    // Check if the user to be added exists'
     if (manager.teamMembers.includes(userId)) {
       return res
         .status(400)
@@ -147,14 +180,20 @@ const acceptRequest = async (req, res) => {
       });
     }
 
+    // Remove from pendingRequests
     manager.pendingRequests = manager.pendingRequests.filter(
       (request) => request.toString() !== userId
     );
 
-    if (!manager.teamMembers.includes(userId)) {
-      manager.teamMembers.push(userId);
-    }
+    // Add to teamMembers
+    manager.teamMembers.push(userId);
     await manager.save();
+
+    // ✅ SET MANAGER FIELD FOR THE USER
+    const user = await User.findById(userId);
+    user.manager = manager._id;
+    user.requestStatus = "accepted";
+    await user.save();
 
     res.status(200).json({
       success: true,
@@ -167,9 +206,48 @@ const acceptRequest = async (req, res) => {
   }
 };
 
+const declineRequest = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const manager = await User.findById(req.user._id);
+
+    if (!manager || manager.role !== "manager") {
+      return res
+        .status(401)
+        .json({ success: false, message: "Manager not found!" });
+    }
+
+    if (!userId || !manager.pendingRequests.includes(userId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No pending request from this user" });
+    }
+
+    const user = await User.findById(userId);
+
+    // Remove user from pendingRequests
+    manager.pendingRequests = manager.pendingRequests.filter(
+      (request) => request.toString() !== userId
+    );
+    await manager.save();
+
+    user.requestStatus = "rejected";
+    await user.save();
+
+    res
+      .status(200)
+      .json({ success: true, message: "Request declined successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   addUserToTeam,
   getTeamMembers,
   removeUser,
   acceptRequest,
+  getPendingRequests,
+  declineRequest,
 };

@@ -10,9 +10,24 @@ const { isAuthenticated } = require("../middleware/userAuth");
 const { isManager } = require("../middleware/isManager");
 const {
   createLead,
-  getManagerLeads,
+  getAllLeads,
+  updateLead,
+  deleteLead,
 } = require("../controllers/leadController");
-const { addUserToTeam, getTeamMembers, removeUser, acceptRequest } = require("../controllers/managerController");
+const {
+  addUserToTeam,
+  getTeamMembers,
+  removeUser,
+  acceptRequest,
+  getPendingRequests,
+  declineRequest,
+} = require("../controllers/managerController");
+const {
+  createDeal,
+  getDeals,
+  updateDeal,
+  deleteDeal,
+} = require("../controllers/dealController");
 
 const ManagerRoutes = express.Router();
 
@@ -29,8 +44,17 @@ ManagerRoutes.get("/my-team", getTeamMembers);
 ManagerRoutes.delete("/remove-user/:id", removeUser);
 
 ManagerRoutes.post("/create-lead", createLead);
-ManagerRoutes.get("/my-leads", getManagerLeads);
+ManagerRoutes.get("/all-leads", getAllLeads);
+ManagerRoutes.post("/edit-lead/:id", updateLead);
+ManagerRoutes.delete("/delete-lead/:id", deleteLead);
 
+ManagerRoutes.get("/pending", getPendingRequests);
 ManagerRoutes.post("/accept-request", acceptRequest);
+ManagerRoutes.post("/decline-request", declineRequest);
+
+ManagerRoutes.post("/deals/create", createDeal);
+ManagerRoutes.get("/deals", getDeals);
+ManagerRoutes.put("/deals/:id", updateDeal);
+ManagerRoutes.delete("/deals/:id", deleteDeal);
 
 module.exports = ManagerRoutes;

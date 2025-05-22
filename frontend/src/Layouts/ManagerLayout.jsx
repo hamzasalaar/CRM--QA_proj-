@@ -41,6 +41,15 @@ export default function ManagerLayout() {
           <Link className="me-3" to="/manager/tasks">
             Task Management
           </Link>
+          <Link className="me-3" to="/manager/requests">
+            Pending Requests
+          </Link>
+          <Link className="me-3" to="/manager/leads">
+            Manage Leads
+          </Link>
+          <Link className="me-3" to="/manager/deals">
+            Manage Deals
+          </Link>
         </div>
         <button
           className="btn btn-outline-danger btn-sm"

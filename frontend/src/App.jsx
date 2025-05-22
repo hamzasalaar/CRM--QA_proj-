@@ -17,6 +17,12 @@ import ManagerLayout from "./Layouts/ManagerLayout";
 import TaskManagement from "./pages/TaskManagement";
 import UserDashboard from "./pages/UserDashboard"; // Assuming this is your user dashboard component
 import UserTasks from "./pages/UserTasks";
+import PendingRequests from "./pages/PendingRequests";
+import RequestStatus from "./pages/RequestStatus";
+import LeadsPage from "./pages/LeadsPage";
+import MyLeads from "./pages/MyLeads";
+import Deals from "./pages/Deals";
+import UserDeals from "./pages/UserDeals";
 
 export default function App() {
   return (
@@ -35,6 +41,10 @@ export default function App() {
           <Route path="/user" element={<UserLayout />}>
             <Route index element={<UserDashboard />} />
             <Route path="tasks" element={<UserTasks />} />
+            <Route path="requests" element={<RequestStatus />} />
+            <Route path="leads" element={<MyLeads />} />
+            <Route path="deals" element={<UserDeals />} />
+            {/* Send Request page */}
           </Route>
 
           {/* Admin Layout */}
@@ -49,6 +59,9 @@ export default function App() {
             <Route index element={<ManagerDashboard />} />
             <Route path="team" element={<TeamManagement />} />
             <Route path="tasks" element={<TaskManagement />} />
+            <Route path="requests" element={<PendingRequests />} />
+            <Route path="leads" element={<LeadsPage />} />
+            <Route path="deals" element={<Deals />} />
           </Route>
         </Routes>
       </div>
