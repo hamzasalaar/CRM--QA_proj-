@@ -27,7 +27,9 @@ export default function UserManagement() {
       try {
         const request = await axios.get(
           "http://localhost:3000/api/admin/getuser",
-          { withCredentials: true }
+          {
+            withCredentials: true,
+          }
         );
         const response = request.data;
         if (response.success) {
@@ -38,9 +40,8 @@ export default function UserManagement() {
       } catch (error) {
         if (error.response && error.response.status === 401) {
           toast.error("Unauthorized access!");
-          navigate("/"); // Redirect to login if unauthorized
+          navigate("/");
         } else {
-          console.error(error);
           setError("An error occurred while fetching users.");
         }
       } finally {
@@ -52,8 +53,8 @@ export default function UserManagement() {
   }, [navigate]);
 
   const handleDeleteClick = (id) => {
-    setUserToDelete(id); // Store user ID
-    setShowConfirmDelete(true); // Show confirmation modal
+    setUserToDelete(id);
+    setShowConfirmDelete(true);
   };
 
   const confirmDelete = async () => {
@@ -68,15 +69,15 @@ export default function UserManagement() {
       const response = request.data;
       if (request.status === 200) {
         toast.success(response.message);
-        setUsers(users.filter((user) => user._id !== userToDelete)); // Update user list
+        setUsers(users.filter((user) => user._id !== userToDelete));
       }
     } catch (error) {
       if (error.response) {
         toast.error(error.response.data.message);
       }
     } finally {
-      setShowConfirmDelete(false); // Hide confirmation modal
-      setUserToDelete(null); // Clear user ID
+      setShowConfirmDelete(false);
+      setUserToDelete(null);
     }
   };
 
@@ -88,6 +89,18 @@ export default function UserManagement() {
   };
 
   const handleUpdate = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!editName.trim() || !editEmail.trim()) {
+      toast.error("Name and email are required.");
+      return;
+    }
+
+    if (!emailRegex.test(editEmail)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
     try {
       const response = await axios.put(
         `http://localhost:3000/api/admin/update/${editingUser}`,
@@ -107,7 +120,6 @@ export default function UserManagement() {
       }
     } catch (error) {
       if (error.response) {
-        console.log(error);
         toast.error(error.response.data.message);
       }
     }
@@ -125,19 +137,13 @@ export default function UserManagement() {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="container mt-5">
       <h3 className="subheading">User List</h3>
 
-      {/* Table Layout for Users */}
       <div className="table-responsive">
         <table className="table table-striped table-hover">
           <thead>
@@ -149,98 +155,98 @@ export default function UserManagement() {
             </tr>
           </thead>
           <tbody>
-  {users.length === 0 ? (
-    <tr>
-      <td colSpan="4" className="text-center">
-        No users found
-      </td>
-    </tr>
-  ) : (
-    users.map((user) => (
-      <tr key={user._id}>
-        <td>
-          {editingUser === user._id ? (
-            <input
-              type="text"
-              value={editName}
-              onChange={(e) => setEditName(e.target.value)}
-              className="form-control form-control-sm"
-            />
-          ) : (
-            user.name
-          )}
-        </td>
-        <td>
-          {editingUser === user._id ? (
-            <input
-              type="email"
-              value={editEmail}
-              onChange={(e) => setEditEmail(e.target.value)}
-              className="form-control form-control-sm"
-            />
-          ) : (
-            user.email
-          )}
-        </td>
-        <td>
-          {editingUser === user._id ? (
-            <select
-              value={editRole}
-              onChange={(e) => setEditRole(e.target.value)}
-              className="form-select form-select-sm"
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
-          ) : (
-            user.role
-          )}
-        </td>
-        <td>
-          {/* Only show buttons if the role is not 'admin' */}
-          {editingUser === user._id ? (
-            <>
-              <button
-                className="btn btn-success btn-sm"
-                onClick={handleUpdate}
-              >
-                Update
-              </button>
-              <button
-                className="btn btn-secondary btn-sm"
-                onClick={() => setEditingUser(null)}
-              >
-                Cancel
-              </button>
-            </>
-          ) : (
-            user.role !== "admin" && (
-              <>
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={() => handleEdit(user)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => handleDeleteClick(user._id)}
-                >
-                  Delete
-                </button>
-              </>
-            )
-          )}
-        </td>
-      </tr>
-    ))
-  )}
-</tbody>
-
+            {users.length === 0 ? (
+              <tr>
+                <td colSpan="4" className="text-center">
+                  No users found
+                </td>
+              </tr>
+            ) : (
+              users.map((user) => (
+                <tr key={user._id}>
+                  <td>
+                    {editingUser === user._id ? (
+                      <input
+                        type="text"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="form-control form-control-sm"
+                        required
+                      />
+                    ) : (
+                      user.name
+                    )}
+                  </td>
+                  <td>
+                    {editingUser === user._id ? (
+                      <input
+                        type="email"
+                        value={editEmail}
+                        onChange={(e) => setEditEmail(e.target.value)}
+                        className="form-control form-control-sm"
+                        required
+                      />
+                    ) : (
+                      user.email
+                    )}
+                  </td>
+                  <td>
+                    {editingUser === user._id ? (
+                      <select
+                        value={editRole}
+                        onChange={(e) => setEditRole(e.target.value)}
+                        className="form-select form-select-sm"
+                      >
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    ) : (
+                      user.role
+                    )}
+                  </td>
+                  <td>
+                    {editingUser === user._id ? (
+                      <>
+                        <button
+                          className="btn btn-success btn-sm me-2"
+                          onClick={handleUpdate}
+                        >
+                          Update
+                        </button>
+                        <button
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => setEditingUser(null)}
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      user.role !== "admin" && (
+                        <>
+                          <button
+                            className="btn btn-primary btn-sm me-2"
+                            onClick={() => handleEdit(user)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="btn btn-danger btn-sm"
+                            onClick={() => handleDeleteClick(user._id)}
+                          >
+                            Delete
+                          </button>
+                        </>
+                      )
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
         </table>
       </div>
 
-      {/* Confirmation Modal */}
+      {/* Delete Confirmation Modal */}
       {showConfirmDelete && (
         <div className="modal show" tabIndex="-1" style={{ display: "block" }}>
           <div className="modal-dialog">
@@ -276,12 +282,6 @@ export default function UserManagement() {
           </div>
         </div>
       )}
-
-      {/* Logout Button */}
-      <br />
-      {/* <button className="btn btn-logout w-100" onClick={handleLogout}>
-        Logout
-      </button> */}
     </div>
   );
 }

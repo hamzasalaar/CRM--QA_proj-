@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 
 const getUser = async (req, res) => {
   try {
-    const users = await userModel.find();
+    const users = await userModel.find({ status: "active" });
     res.status(200).json({ success: true, data: users });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -15,7 +15,6 @@ const deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
 
-    // Validate ObjectId format
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res
         .status(400)
@@ -34,11 +33,13 @@ const deleteUser = async (req, res) => {
         .status(401)
         .json({ success: false, message: "Admin can't be deleted!" });
 
-    await userModel.findByIdAndDelete(userId);
+    user.status = "inactive";
+    await user.save();
 
-    res
-      .status(200)
-      .json({ success: true, message: "User deleted successfully!" });
+    res.status(200).json({
+      success: true,
+      message: "User marked as inactive successfully!",
+    });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

@@ -102,7 +102,7 @@ const CreateLead = () => {
               <div className="col-md-6 mb-3">
                 <label>Phone</label>
                 <input
-                  type="text"
+                  type="number"
                   name="phone"
                   value={formData.phone}
                   className="form-control"

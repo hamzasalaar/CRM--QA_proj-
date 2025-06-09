@@ -31,6 +31,7 @@ const UserSchema = new mongoose.Schema(
       enum: ["none", "pending", "accepted", "rejected"],
       default: "none",
     },
+    status: { type: String, enum: ["active", "inactive"], default: "active" },
 
     failedAttempts: {
       type: Number,
